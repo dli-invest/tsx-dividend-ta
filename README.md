@@ -1,10 +1,15 @@
-# tsx-div-ta
+# tsx-dividend-ta
+
+[![CI](https://github.com/dli-invest/tsx-dividend-ta/actions/workflows/ci.yml/badge.svg)](https://github.com/dli-invest/tsx-dividend-ta/actions/workflows/ci.yml)
+[![Daily TSX scan](https://github.com/dli-invest/tsx-dividend-ta/actions/workflows/daily-scan.yml/badge.svg)](https://github.com/dli-invest/tsx-dividend-ta/actions/workflows/daily-scan.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A low-resource technical-analysis bot for **core Canadian (TSX) dividend stocks**, built to run in
 WSL2. It downloads daily prices and dividends, works out the market regime (bull / bear / neutral),
 computes indicators with **pandas-ta**, and produces explainable bullish and bearish signals plus a
 detailed composite score. An optional AI review by Claude summarises each report for a fraction of a
-cent.
+cent. A GitHub Actions workflow runs it every weekday after the close and posts the report to
+Discord. (The Python package and CLI are named `tsx-div-ta`.)
 
 > **Not financial advice.** Output is mechanical, informational and can be wrong. Data comes from
 > Yahoo Finance via `yfinance` (unofficial, may be delayed or incorrect).
@@ -47,7 +52,11 @@ python3 -m venv ~/.uv-bootstrap && ~/.uv-bootstrap/bin/pip install uv
 ```
 
 ```bash
-cd ~/claude_space/tsx-div-ta && ~/.uv-bootstrap/bin/uv venv --python 3.12 --seed .venv
+git clone https://github.com/dli-invest/tsx-dividend-ta.git && cd tsx-dividend-ta
+```
+
+```bash
+~/.uv-bootstrap/bin/uv venv --python 3.12 --seed .venv
 ```
 
 ```bash
@@ -71,11 +80,14 @@ Use `".[dev,ai]"` to also install the test and lint tools. All versions are pinn
 | `scan --format json\|csv` | print JSON/CSV instead of the table (files are written either way) |
 | `scan --symbols RY.TO,TD.TO` | override the universe |
 | `scan --review` / `--no-review` | add or skip the Claude review |
+| `scan --notify` | also post the report to Discord (webhook URL from `DISCORD_WEBHOOK_URL`) |
+| `check-webhook` | verify the Discord webhook without posting anything |
 | `update-cache [--full]` | refresh cached data only |
 | `evaluate --horizons 20,60` | historical forward returns after each rule fired (descriptive, not a backtest) |
 
 Exit codes: **0** success, **1** partial (some symbols failed or are stale), **2** fatal (bad config
-or no data at all).
+or no data at all), **3** report produced but Discord delivery failed. Signals are only marked as
+seen once they were delivered, so a failed post re-sends them as NEW next time.
 
 ## Configuration
 
@@ -221,18 +233,50 @@ Otherwise the SDK resolves `ANTHROPIC_AUTH_TOKEN` or an `ant auth login` profile
 changes signals or scores and never fails a scan. Problems such as no credentials, network errors or
 a refusal show up as a status in the report.
 
+## Daily report to Discord (GitHub Actions)
+
+[`.github/workflows/daily-scan.yml`](.github/workflows/daily-scan.yml) runs every weekday at
+**22:00 UTC**: 17:00 ET in winter and 18:00 ET in summer, so it's always after the 16:30 ET
+completed-bar cutoff. The job:
+
+1. checks that the webhook secret is present and valid (`check-webhook`, which posts nothing);
+2. restores the market-data cache and last-run state from the previous run (`actions/cache`);
+3. runs `scan --notify`, adding `--review` when an `ANTHROPIC_API_KEY` secret is available;
+4. uploads `reports/` and `logs/` as a 30-day artifact.
+
+**The Discord message** is one embed with:
+- the market regime and breadth
+- the top bullish and bearish stocks
+- the day's new signals
+- dividend alerts (cuts, yield traps)
+- data problems
+- the AI review, if enabled
+
+`report.txt` and `signals.csv` are attached, and the message never @-mentions anyone.
+
+**Secrets.** The webhook comes from the organization secret **`DISCORD_DAILY_REVIEW_WEBHOOK`**,
+mapped to `DISCORD_WEBHOOK_URL`. If the job fails with "secret is not available", an org admin
+needs to grant this repository access to it under *Settings → Secrets and variables → Actions*. The
+webhook URL is never logged or put in error messages.
+
+**Manual runs.** Use *Actions → Daily TSX scan → Run workflow*. Untick **post** to scan and check
+the webhook without posting.
+
+**Exit codes.** Exit code 1 (some symbols failed) still counts as success. Exit codes 2 and 3 fail
+the job, so GitHub emails you about it.
+
 ## Scheduling on WSL
 
 WSL shuts its VM down when idle, so cron inside WSL is unreliable. Use **Windows Task Scheduler** to
 start `run.sh`. It runs at low priority, takes a lock so runs never overlap, uses Toronto time, and
 appends to `logs/run.log`.
 
-Run this in a Windows Command Prompt. It schedules weekdays at 15:00 **Windows local time**, which is
+Run this in a Windows Command Prompt, replacing `<you>` with your WSL username. It schedules weekdays at 15:00 **Windows local time**, which is
 17:00 ET if your PC is on Mountain time. Adjust `/ST` for your timezone so it runs after the 16:30 ET
 buffer.
 
 ```bash
-schtasks /Create /TN "tsx-div-ta" /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST 15:00 /TR "wsl.exe -d Ubuntu -- /home/david/claude_space/tsx-div-ta/run.sh"
+schtasks /Create /TN "tsx-div-ta" /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST 15:00 /TR "wsl.exe -d Ubuntu -- /home/<you>/tsx-dividend-ta/run.sh"
 ```
 
 **Optional resource caps** go in `%UserProfile%\.wslconfig` on Windows (applies to all of WSL):
@@ -259,7 +303,7 @@ fixture blocks all network access. Other commands:
 | `.venv/bin/mypy` | type checks |
 | `UPDATE_GOLDEN=1 .venv/bin/python -m pytest tests/test_cli.py -k golden` | refresh the golden report after an intentional output change |
 
-The 303 tests cover:
+The 331 tests cover:
 - config validation
 - data cleaning, caching and incremental refresh
 - indicators vs reference formulas
@@ -268,6 +312,7 @@ The 303 tests cover:
 - golden JSON output
 - the CLI and its exit codes
 - the AI review loop (with a fake client)
+- the Discord notifier (embed limits, retries, secret handling)
 - randomized property-based tests
 - a 30-symbol × 5-year resource-budget test
 
@@ -288,3 +333,7 @@ would catch any maths differences if you swap backends.
   universe.
 - Signals ignore fundamentals, news and earnings. The AI review is told to say so rather than invent
   them.
+
+## License
+
+[MIT](LICENSE). Contributions welcome: please run `ruff`, `mypy` and `pytest` before opening a PR.

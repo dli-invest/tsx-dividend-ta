@@ -126,3 +126,9 @@ max_turns = 4                    # cap on agent tool-use round trips
 max_symbols = 12                 # report rows included in the digest
 api_key_env = "ANTHROPIC_API_KEY"
 timeout_s = 60.0
+
+[notify]
+# `scan --notify` posts the report to Discord. The webhook URL is a secret: it is read from this
+# environment variable (in GitHub Actions it comes from the DISCORD_DAILY_REVIEW_WEBHOOK secret).
+discord_webhook_env = "DISCORD_WEBHOOK_URL"
+attach_files = true              # attach report.txt and signals.csv

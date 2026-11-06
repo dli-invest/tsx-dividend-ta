@@ -46,6 +46,7 @@ def test_project_config_file_matches_defaults() -> None:
     assert cfg.signals == d.signals
     assert cfg.scoring == d.scoring
     assert cfg.review == d.review
+    assert cfg.notify == d.notify
     assert cfg.base_dir == PROJECT_CONFIG.parent
 
 
@@ -131,6 +132,8 @@ def test_relative_paths_resolve_against_config_dir(tmp_path: Path) -> None:
         ({"review": {"max_symbols": 0}}, "max_symbols"),
         ({"review": {"timeout_s": 0}}, "timeout_s"),
         ({"review": {"model": ""}}, "non-empty string"),
+        ({"notify": {"discord_webhook_env": "https://discord.com/x"}}, "environment variable name"),
+        ({"notify": {"attach_files": "yes"}}, "true/false"),
     ],
 )
 def test_invalid_values_rejected(raw: dict, match: str) -> None:

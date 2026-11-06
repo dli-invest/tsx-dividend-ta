@@ -1,11 +1,13 @@
 """Command-line interface.
 
-Exit codes: 0 success, 1 partial (some symbols failed), 2 fatal (bad config / no data)."""
+Exit codes: 0 success, 1 partial (some symbols failed), 2 fatal (bad config / no data),
+3 report produced but Discord delivery failed (or webhook check failed)."""
 
 from __future__ import annotations
 
 import argparse
 import logging
+import os
 import sys
 from collections.abc import Sequence
 from datetime import date
@@ -71,6 +73,15 @@ def build_parser() -> argparse.ArgumentParser:
     rv = scan.add_mutually_exclusive_group()
     rv.add_argument("--review", action="store_true", help="add an AI review (needs API key)")
     rv.add_argument("--no-review", action="store_true", help="skip AI review even if enabled")
+    scan.add_argument(
+        "--notify", action="store_true", help="post the report to Discord (webhook from env)"
+    )
+
+    sub.add_parser(
+        "check-webhook",
+        parents=[common],
+        help="verify the Discord webhook from env without posting anything",
+    )
 
     upd = sub.add_parser("update-cache", parents=[common], help="refresh cached market data")
     upd.add_argument("--full", action="store_true", help="re-download full history")
@@ -114,6 +125,7 @@ def main(
     fetcher: Fetcher | None = None,
     clock: Clock | None = None,
     review_client: Any = None,
+    notifier: Any = None,
 ) -> int:
     args = build_parser().parse_args(argv)
     try:
@@ -122,6 +134,8 @@ def main(
         print(f"config error: {exc}", file=sys.stderr)
         return 2
     setup_logging(cfg.path(cfg.data.logs_dir), args.verbose)
+    if args.command == "check-webhook":
+        return _cmd_check_webhook(cfg, notifier)
     clock = clock or SystemClock()
     offline = bool(getattr(args, "offline", False))
     if fetcher is None and not offline:
@@ -140,7 +154,25 @@ def main(
         return _cmd_update(store, symbols, cfg, args.full)
     if args.command == "evaluate":
         return _cmd_evaluate(store, symbols, cfg, args.horizons, offline, clock)
-    return _cmd_scan(store, symbols, cfg, args, clock, review_client)
+    return _cmd_scan(store, symbols, cfg, args, clock, review_client, notifier)
+
+
+def _make_notifier(cfg: AppConfig, notifier: Any) -> Any:
+    from tsx_div_ta.notify import notifier_from_env
+
+    return notifier or notifier_from_env(cfg.notify.discord_webhook_env, dict(os.environ))
+
+
+def _cmd_check_webhook(cfg: AppConfig, notifier: Any) -> int:
+    from tsx_div_ta.notify import NotifyError
+
+    try:
+        status = _make_notifier(cfg, notifier).check()
+    except NotifyError as exc:
+        print(f"webhook check failed: {exc}", file=sys.stderr)
+        return 3
+    print(f"Discord webhook OK (HTTP {status}); nothing was posted")
+    return 0
 
 
 def _cmd_update(store: DataStore, symbols: list[str], cfg: AppConfig, full: bool) -> int:
@@ -189,6 +221,7 @@ def _cmd_scan(
     args: argparse.Namespace,
     clock: Clock,
     review_client: Any,
+    notifier: Any = None,
 ) -> int:
     from tsx_div_ta.pipeline import run_scan
     from tsx_div_ta.report import render_table, to_csv, to_json, write_reports
@@ -204,15 +237,34 @@ def _cmd_scan(
 
         result.review = review_report(result, cfg.review, client=review_client)
 
+    paths: dict[str, Path] = {}
     if not args.no_save:
         paths = write_reports(result, cfg.path(cfg.data.reports_dir))
         log.info("reports written: %s", ", ".join(str(p) for p in paths.values()))
-        if not historical and result.exit_code < 2:
-            save_seen(state_path, result.signal_keys, result.as_of)
 
     render = {"table": render_table, "csv": to_csv, "json": to_json}[args.format]
     sys.stdout.write(render(result))
-    return result.exit_code
+    sys.stdout.flush()
+
+    delivered = True
+    if args.notify:
+        delivered = _notify(cfg, result, paths, notifier)
+    # Only remember signals as "seen" once they were actually delivered.
+    if not args.no_save and not historical and result.exit_code < 2 and delivered:
+        save_seen(state_path, result.signal_keys, result.as_of)
+    return result.exit_code if delivered else 3
+
+
+def _notify(cfg: AppConfig, result: Any, paths: dict[str, Path], notifier: Any) -> bool:
+    from tsx_div_ta.notify import NotifyError
+
+    files = [paths[k] for k in ("txt", "csv") if k in paths] if cfg.notify.attach_files else []
+    try:
+        _make_notifier(cfg, notifier).send(result, files)
+    except NotifyError as exc:
+        log.error("Discord notification failed: %s", exc)
+        return False
+    return True
 
 
 if __name__ == "__main__":  # pragma: no cover

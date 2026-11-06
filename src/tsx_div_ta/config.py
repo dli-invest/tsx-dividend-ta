@@ -330,6 +330,19 @@ class ReviewConfig:
 
 
 @dataclass(frozen=True)
+class NotifyConfig:
+    discord_webhook_env: str = "DISCORD_WEBHOOK_URL"
+    attach_files: bool = True
+
+    def __post_init__(self) -> None:
+        _check_types(self)
+        _require(
+            bool(re.fullmatch(r"[A-Z_][A-Z0-9_]*", self.discord_webhook_env)),
+            "notify.discord_webhook_env must be an environment variable name",
+        )
+
+
+@dataclass(frozen=True)
 class AppConfig:
     universe: UniverseConfig = field(default_factory=UniverseConfig)
     data: DataConfig = field(default_factory=DataConfig)
@@ -338,6 +351,7 @@ class AppConfig:
     signals: SignalConfig = field(default_factory=SignalConfig)
     scoring: ScoringConfig = field(default_factory=ScoringConfig)
     review: ReviewConfig = field(default_factory=ReviewConfig)
+    notify: NotifyConfig = field(default_factory=NotifyConfig)
     base_dir: Path = field(default_factory=Path.cwd)
 
     def __post_init__(self) -> None:
@@ -362,6 +376,7 @@ _SECTIONS: dict[str, type] = {
     "signals": SignalConfig,
     "scoring": ScoringConfig,
     "review": ReviewConfig,
+    "notify": NotifyConfig,
 }
 
 

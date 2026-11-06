@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,8 @@ name = "tsx-div-ta"
 version = "1.0.0"
 description = "Low-resource technical-analysis bot for core Canadian (TSX) dividend stocks. Analysis only - not financial advice."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 # Exact pins: verified together on CPython 3.12.16 / Ubuntu 22.04 (WSL2), 2026-11-05.
 classifiers = [
@@ -31,6 +33,10 @@ dev = [
     "ruff==0.17.4",
     "mypy==2.4.1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/dli-invest/tsx-dividend-ta"
+Issues = "https://github.com/dli-invest/tsx-dividend-ta/issues"
 
 [project.scripts]
 tsx-div-ta = "tsx_div_ta.__main__:main"
