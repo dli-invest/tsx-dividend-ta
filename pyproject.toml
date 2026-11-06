@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tsx-div-ta"
+version = "1.0.0"
+description = "Low-resource technical-analysis bot for core Canadian (TSX) dividend stocks. Analysis only - not financial advice."
+readme = "README.md"
+requires-python = ">=3.12"
+# Exact pins: verified together on CPython 3.12.16 / Ubuntu 22.04 (WSL2), 2026-11-05.
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "pandas==2.3.3",
+    "numpy==2.2.6",
+    "pandas-ta-classic==0.8.32",
+    "yfinance==1.8.0",
+    "pyarrow==25.0.1",
+]
+
+[project.optional-dependencies]
+ai = ["anthropic==2.6.0"]  # optional AI review of reports (scan --review)
+dev = [
+    "anthropic==2.6.0",
+    "pytest==9.2.0",
+    "pytest-cov==7.1.0",
+    "hypothesis==6.168.5",
+    "ruff==0.17.4",
+    "mypy==2.4.1",
+]
+
+[project.scripts]
+tsx-div-ta = "tsx_div_ta.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -m 'not network' --cov=tsx_div_ta --cov-report=term-missing --cov-fail-under=90"
+markers = [
+    "network: hits the real Yahoo Finance API (deselected by default; run with -m network)",
+    "slow: performance / resource-budget tests",
+]
+filterwarnings = ["error::pandas.errors.SettingWithCopyWarning"]
+
+[tool.coverage.run]
+branch = true
+source = ["tsx_div_ta"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PL", "NPY", "PD"]
+ignore = [
+    "PLR0913", # many-argument functions are fine for pure helpers
+    "PLR2004", # magic values are mostly documented thresholds
+    "PLR0915",
+    "PLR0912",
+    "PLC0415", # intentional lazy imports (yfinance/anthropic only load when needed)
+    "PLR0917",
+    "PLR0911",
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    "PD011",   # false positives: Signal.values is a dict field, not a pandas accessor
+]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+ignore_missing_imports = true

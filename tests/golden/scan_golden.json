@@ -1,0 +1,699 @@
+{
+  "as_of": "2026-11-05",
+  "disclaimer": "For informational and educational purposes only. Not financial advice. Signals are mechanical, can be wrong, and ignore your personal situation. Data comes from Yahoo Finance via yfinance (unofficial) and may be delayed or incorrect.",
+  "failures": {},
+  "generated_at": "2026-11-05T18:00:00-05:00",
+  "market": {
+    "benchmark": "XIC.TO",
+    "breadth": 0.3333,
+    "breadth_confirms": false,
+    "breadth_regime": "BEAR",
+    "date": "2026-11-05",
+    "regime": "BULL"
+  },
+  "meta": {
+    "requested_as_of": null,
+    "stale": [],
+    "universe_size": 3,
+    "version": "1.0.0"
+  },
+  "review": null,
+  "rows": [
+    {
+      "above_sma_slow": true,
+      "adx": 21.84,
+      "atr_pct": 2.6063,
+      "bars": 700,
+      "close": 129.4314,
+      "components": {
+        "dividend": -0.242,
+        "momentum": 0.5577,
+        "relative_strength": 0.0957,
+        "risk": 0.2693,
+        "signals": 0.0,
+        "trend": 0.8069,
+        "volume": 0.2382
+      },
+      "confidence": 1.0,
+      "date": "2026-11-05",
+      "dist_sma_slow": 9.424,
+      "div_growth": 0.0,
+      "drivers": [
+        "+5.0 trend.sma200_slope",
+        "+5.0 trend.sma50_vs_200",
+        "+5.0 trend.supertrend"
+      ],
+      "factors": [
+        {
+          "component": "trend",
+          "name": "sma200",
+          "note": "+1 at >=10% above SMA200, -1 at >=10% below",
+          "points": 4.712,
+          "raw": 9.424,
+          "value": 0.9424
+        },
+        {
+          "component": "trend",
+          "name": "sma50_vs_200",
+          "note": "SMA50/SMA200 gap; +/-5% saturates",
+          "points": 5.0,
+          "raw": 7.0625,
+          "value": 1.0
+        },
+        {
+          "component": "trend",
+          "name": "sma200_slope",
+          "note": "SMA200 20-day change; +/-2% saturates",
+          "points": 5.0,
+          "raw": 2.72,
+          "value": 1.0
+        },
+        {
+          "component": "trend",
+          "name": "supertrend",
+          "note": "Supertrend direction",
+          "points": 5.0,
+          "raw": 1.0,
+          "value": 1.0
+        },
+        {
+          "component": "trend",
+          "name": "adx",
+          "note": "ADX strength (20->40) signed by +DI vs -DI",
+          "points": 0.46,
+          "raw": 21.8395,
+          "value": 0.092
+        },
+        {
+          "component": "momentum",
+          "name": "rsi",
+          "note": "RSI 75 -> +1, 25 -> -1",
+          "points": 2.925,
+          "raw": 60.9671,
+          "value": 0.4387
+        },
+        {
+          "component": "momentum",
+          "name": "macd_hist",
+          "note": "MACD histogram scaled by 0.25 ATR",
+          "points": 4.493,
+          "raw": 0.5684,
+          "value": 0.674
+        },
+        {
+          "component": "momentum",
+          "name": "roc_3m",
+          "note": "3-month rate of change; +/-15% saturates",
+          "points": 3.737,
+          "raw": 8.4079,
+          "value": 0.5605
+        },
+        {
+          "component": "relative_strength",
+          "name": "rs_roc_3m",
+          "note": "3-month out/under-performance vs benchmark; +/-10%",
+          "points": 2.79,
+          "raw": 3.7203,
+          "value": 0.372
+        },
+        {
+          "component": "relative_strength",
+          "name": "rs_range",
+          "note": "RS line position in its 63-day range",
+          "points": -1.354,
+          "raw": 0.4097,
+          "value": -0.1806
+        },
+        {
+          "component": "volume",
+          "name": "cmf",
+          "note": "Chaikin money flow; +/-0.2 saturates",
+          "points": 0.871,
+          "raw": 0.0522,
+          "value": 0.2612
+        },
+        {
+          "component": "volume",
+          "name": "obv_slope",
+          "note": "20-day OBV change as share of volume",
+          "points": 1.91,
+          "raw": 0.2865,
+          "value": 0.5729
+        },
+        {
+          "component": "volume",
+          "name": "confirmation",
+          "note": "today's direction x relative-volume excess",
+          "points": -0.398,
+          "raw": 1.1194,
+          "value": -0.1194
+        },
+        {
+          "component": "dividend",
+          "name": "yield_percentile",
+          "note": "TTM yield vs own 5y history (cheap = high percentile)",
+          "points": -3.253,
+          "raw": 0.012,
+          "value": -0.976
+        },
+        {
+          "component": "dividend",
+          "name": "growth",
+          "note": "YoY TTM dividend growth; +/-10% saturates",
+          "points": 0.0,
+          "raw": 0.0,
+          "value": 0.0
+        },
+        {
+          "component": "dividend",
+          "name": "safety",
+          "note": "no recent cut",
+          "points": 0.833,
+          "raw": 0.0,
+          "value": 0.25
+        },
+        {
+          "component": "risk",
+          "name": "volatility",
+          "note": "ATR% vs 1y median (calm +, expanding -)",
+          "points": 0.125,
+          "raw": 0.9813,
+          "value": 0.0374
+        },
+        {
+          "component": "risk",
+          "name": "drawdown",
+          "note": "distance from 52w high: 0% -> +1, -10% -> 0, -20% -> -1",
+          "points": 2.568,
+          "raw": -2.2967,
+          "value": 0.7703
+        },
+        {
+          "component": "risk",
+          "name": "overextension",
+          "note": "penalty when >15% from SMA200 (either side)",
+          "points": -0.0,
+          "raw": 9.424,
+          "value": -0.0
+        },
+        {
+          "component": "signals",
+          "name": "net",
+          "note": "sum of bullish minus bearish signal strengths",
+          "points": 0.0,
+          "raw": 0,
+          "value": 0.0
+        }
+      ],
+      "fwd_yield": 1.5452,
+      "message": null,
+      "new_signals": [],
+      "outlook": "BULLISH",
+      "quality_issues": [],
+      "rsi": 60.97,
+      "score": 35.42,
+      "signals": [],
+      "stale": false,
+      "status": "OK",
+      "stock_regime": "BULL",
+      "stop_long": 122.68,
+      "stop_short": 136.18,
+      "symbol": "AAA.TO",
+      "ttm_yield": 1.5452,
+      "yield_pct": 0.012
+    },
+    {
+      "above_sma_slow": false,
+      "adx": 79.36,
+      "atr_pct": 2.2178,
+      "bars": 700,
+      "close": 99.5093,
+      "components": {
+        "dividend": 0.1718,
+        "momentum": -0.4818,
+        "relative_strength": -0.856,
+        "risk": 0.0916,
+        "signals": -0.3,
+        "trend": 0.0367,
+        "volume": -0.4782
+      },
+      "confidence": 1.0,
+      "date": "2026-11-05",
+      "dist_sma_slow": -2.2764,
+      "div_growth": 0.0,
+      "drivers": [
+        "-7.5 relative_strength.rs_range",
+        "-6.7 momentum.rsi",
+        "-5.3 relative_strength.rs_roc_3m"
+      ],
+      "factors": [
+        {
+          "component": "trend",
+          "name": "sma200",
+          "note": "+1 at >=10% above SMA200, -1 at >=10% below",
+          "points": -1.138,
+          "raw": -2.2764,
+          "value": -0.2276
+        },
+        {
+          "component": "trend",
+          "name": "sma50_vs_200",
+          "note": "SMA50/SMA200 gap; +/-5% saturates",
+          "points": 1.425,
+          "raw": 1.4253,
+          "value": 0.2851
+        },
+        {
+          "component": "trend",
+          "name": "sma200_slope",
+          "note": "SMA200 20-day change; +/-2% saturates",
+          "points": 0.631,
+          "raw": 0.2526,
+          "value": 0.1263
+        },
+        {
+          "component": "trend",
+          "name": "supertrend",
+          "note": "Supertrend direction",
+          "points": 5.0,
+          "raw": 1.0,
+          "value": 1.0
+        },
+        {
+          "component": "trend",
+          "name": "adx",
+          "note": "ADX strength (20->40) signed by +DI vs -DI",
+          "points": -5.0,
+          "raw": 79.3586,
+          "value": -1.0
+        },
+        {
+          "component": "momentum",
+          "name": "rsi",
+          "note": "RSI 75 -> +1, 25 -> -1",
+          "points": -6.667,
+          "raw": 2.9749,
+          "value": -1.0
+        },
+        {
+          "component": "momentum",
+          "name": "macd_hist",
+          "note": "MACD histogram scaled by 0.25 ATR",
+          "points": -1.669,
+          "raw": -0.1382,
+          "value": -0.2504
+        },
+        {
+          "component": "momentum",
+          "name": "roc_3m",
+          "note": "3-month rate of change; +/-15% saturates",
+          "points": -1.299,
+          "raw": -2.923,
+          "value": -0.1949
+        },
+        {
+          "component": "relative_strength",
+          "name": "rs_roc_3m",
+          "note": "3-month out/under-performance vs benchmark; +/-10%",
+          "points": -5.34,
+          "raw": -7.1206,
+          "value": -0.7121
+        },
+        {
+          "component": "relative_strength",
+          "name": "rs_range",
+          "note": "RS line position in its 63-day range",
+          "points": -7.5,
+          "raw": 0.0,
+          "value": -1.0
+        },
+        {
+          "component": "volume",
+          "name": "cmf",
+          "note": "Chaikin money flow; +/-0.2 saturates",
+          "points": -1.449,
+          "raw": -0.0869,
+          "value": -0.4346
+        },
+        {
+          "component": "volume",
+          "name": "obv_slope",
+          "note": "20-day OBV change as share of volume",
+          "points": -3.333,
+          "raw": -1.0,
+          "value": -1.0
+        },
+        {
+          "component": "volume",
+          "name": "confirmation",
+          "note": "today's direction x relative-volume excess",
+          "points": -0.0,
+          "raw": 0.9195,
+          "value": -0.0
+        },
+        {
+          "component": "dividend",
+          "name": "yield_percentile",
+          "note": "TTM yield vs own 5y history (cheap = high percentile)",
+          "points": 0.885,
+          "raw": 0.6327,
+          "value": 0.2655
+        },
+        {
+          "component": "dividend",
+          "name": "growth",
+          "note": "YoY TTM dividend growth; +/-10% saturates",
+          "points": 0.0,
+          "raw": 0.0,
+          "value": 0.0
+        },
+        {
+          "component": "dividend",
+          "name": "safety",
+          "note": "no recent cut",
+          "points": 0.833,
+          "raw": 0.0,
+          "value": 0.25
+        },
+        {
+          "component": "risk",
+          "name": "volatility",
+          "note": "ATR% vs 1y median (calm +, expanding -)",
+          "points": -0.321,
+          "raw": 1.0481,
+          "value": -0.0963
+        },
+        {
+          "component": "risk",
+          "name": "drawdown",
+          "note": "distance from 52w high: 0% -> +1, -10% -> 0, -20% -> -1",
+          "points": 1.237,
+          "raw": -6.2893,
+          "value": 0.3711
+        },
+        {
+          "component": "risk",
+          "name": "overextension",
+          "note": "penalty when >15% from SMA200 (either side)",
+          "points": -0.0,
+          "raw": -2.2764,
+          "value": -0.0
+        },
+        {
+          "component": "signals",
+          "name": "net",
+          "note": "sum of bullish minus bearish signal strengths",
+          "points": -3.0,
+          "raw": -0.3,
+          "value": -0.3
+        }
+      ],
+      "fwd_yield": 5.2256,
+      "message": null,
+      "new_signals": [
+        "relative_weakness"
+      ],
+      "outlook": "BEARISH",
+      "quality_issues": [],
+      "rsi": 2.97,
+      "score": -26.7,
+      "signals": [
+        "relative_weakness"
+      ],
+      "stale": false,
+      "status": "OK",
+      "stock_regime": "NEUTRAL",
+      "stop_long": 95.1,
+      "stop_short": 103.92,
+      "symbol": "CCC.TO",
+      "ttm_yield": 5.2256,
+      "yield_pct": 0.6327
+    },
+    {
+      "above_sma_slow": false,
+      "adx": 21.74,
+      "atr_pct": 2.8329,
+      "bars": 700,
+      "close": 46.9475,
+      "components": {
+        "dividend": -1.0,
+        "momentum": -0.047,
+        "relative_strength": -1.0,
+        "risk": -0.0714,
+        "signals": -0.84,
+        "trend": -0.4651,
+        "volume": 0.045
+      },
+      "confidence": 0.95,
+      "date": "2026-11-05",
+      "dist_sma_slow": -5.1434,
+      "div_growth": -12.5,
+      "drivers": [
+        "-8.4 signals.net",
+        "-7.5 relative_strength.rs_range",
+        "-7.5 relative_strength.rs_roc_3m"
+      ],
+      "factors": [
+        {
+          "component": "trend",
+          "name": "sma200",
+          "note": "+1 at >=10% above SMA200, -1 at >=10% below",
+          "points": -2.572,
+          "raw": -5.1434,
+          "value": -0.5143
+        },
+        {
+          "component": "trend",
+          "name": "sma50_vs_200",
+          "note": "SMA50/SMA200 gap; +/-5% saturates",
+          "points": -3.009,
+          "raw": -3.0086,
+          "value": -0.6017
+        },
+        {
+          "component": "trend",
+          "name": "sma200_slope",
+          "note": "SMA200 20-day change; +/-2% saturates",
+          "points": -1.481,
+          "raw": -0.5924,
+          "value": -0.2962
+        },
+        {
+          "component": "trend",
+          "name": "supertrend",
+          "note": "Supertrend direction",
+          "points": -5.0,
+          "raw": -1.0,
+          "value": -1.0
+        },
+        {
+          "component": "trend",
+          "name": "adx",
+          "note": "ADX strength (20->40) signed by +DI vs -DI",
+          "points": 0.435,
+          "raw": 21.739,
+          "value": 0.087
+        },
+        {
+          "component": "momentum",
+          "name": "rsi",
+          "note": "RSI 75 -> +1, 25 -> -1",
+          "points": -0.26,
+          "raw": 49.0265,
+          "value": -0.0389
+        },
+        {
+          "component": "momentum",
+          "name": "macd_hist",
+          "note": "MACD histogram scaled by 0.25 ATR",
+          "points": 3.505,
+          "raw": 0.1748,
+          "value": 0.5258
+        },
+        {
+          "component": "momentum",
+          "name": "roc_3m",
+          "note": "3-month rate of change; +/-15% saturates",
+          "points": -4.185,
+          "raw": -9.4157,
+          "value": -0.6277
+        },
+        {
+          "component": "relative_strength",
+          "name": "rs_roc_3m",
+          "note": "3-month out/under-performance vs benchmark; +/-10%",
+          "points": -7.5,
+          "raw": -13.3326,
+          "value": -1.0
+        },
+        {
+          "component": "relative_strength",
+          "name": "rs_range",
+          "note": "RS line position in its 63-day range",
+          "points": -7.5,
+          "raw": 0.0,
+          "value": -1.0
+        },
+        {
+          "component": "volume",
+          "name": "cmf",
+          "note": "Chaikin money flow; +/-0.2 saturates",
+          "points": 0.46,
+          "raw": 0.0276,
+          "value": 0.1379
+        },
+        {
+          "component": "volume",
+          "name": "obv_slope",
+          "note": "20-day OBV change as share of volume",
+          "points": 0.694,
+          "raw": 0.1041,
+          "value": 0.2081
+        },
+        {
+          "component": "volume",
+          "name": "confirmation",
+          "note": "today's direction x relative-volume excess",
+          "points": -0.703,
+          "raw": 1.211,
+          "value": -0.211
+        },
+        {
+          "component": "dividend",
+          "name": "yield_percentile",
+          "note": "",
+          "points": 0.0,
+          "raw": null,
+          "value": null
+        },
+        {
+          "component": "dividend",
+          "name": "growth",
+          "note": "YoY TTM dividend growth; +/-10% saturates",
+          "points": -5.0,
+          "raw": -12.5,
+          "value": -1.0
+        },
+        {
+          "component": "dividend",
+          "name": "safety",
+          "note": "dividend cut or suspended within lookback",
+          "points": -5.0,
+          "raw": 1.0,
+          "value": -1.0
+        },
+        {
+          "component": "risk",
+          "name": "volatility",
+          "note": "ATR% vs 1y median (calm +, expanding -)",
+          "points": 0.188,
+          "raw": 0.9718,
+          "value": 0.0565
+        },
+        {
+          "component": "risk",
+          "name": "drawdown",
+          "note": "distance from 52w high: 0% -> +1, -10% -> 0, -20% -> -1",
+          "points": -0.902,
+          "raw": -12.7068,
+          "value": -0.2707
+        },
+        {
+          "component": "risk",
+          "name": "overextension",
+          "note": "penalty when >15% from SMA200 (either side)",
+          "points": -0.0,
+          "raw": -5.1434,
+          "value": -0.0
+        },
+        {
+          "component": "signals",
+          "name": "net",
+          "note": "sum of bullish minus bearish signal strengths",
+          "points": -8.4,
+          "raw": -0.84,
+          "value": -0.84
+        }
+      ],
+      "fwd_yield": 4.2601,
+      "message": null,
+      "new_signals": [
+        "dividend_cut",
+        "relative_weakness"
+      ],
+      "outlook": "BEARISH",
+      "quality_issues": [],
+      "rsi": 49.03,
+      "score": -46.23,
+      "signals": [
+        "dividend_cut",
+        "relative_weakness"
+      ],
+      "stale": false,
+      "status": "OK",
+      "stock_regime": "BEAR",
+      "stop_long": 44.29,
+      "stop_short": 49.61,
+      "symbol": "BBB.TO",
+      "ttm_yield": 7.4551,
+      "yield_pct": 0.3733
+    }
+  ],
+  "schema_version": "1.1",
+  "signals": [
+    {
+      "date": "2026-11-05",
+      "direction": "BEARISH",
+      "market_regime": "BULL",
+      "name": "dividend_cut",
+      "playbook": "ANY",
+      "reason": "Dividend cut or suspended recently (last 0.5000 vs previous 1.0000)",
+      "stock_regime": "BEAR",
+      "strength": 0.54,
+      "symbol": "BBB.TO",
+      "values": {
+        "last_div": 0.5,
+        "prev_div": 1.0
+      }
+    },
+    {
+      "date": "2026-11-05",
+      "direction": "BEARISH",
+      "market_regime": "BULL",
+      "name": "relative_weakness",
+      "playbook": "BEAR",
+      "reason": "Relative strength vs benchmark at a new 63-day low (RS ROC -13.3%)",
+      "stock_regime": "BEAR",
+      "strength": 0.3,
+      "symbol": "BBB.TO",
+      "values": {
+        "rs": 0.920205,
+        "rs_prior_low": 0.927942,
+        "rs_roc": -13.332578
+      }
+    },
+    {
+      "date": "2026-11-05",
+      "direction": "BEARISH",
+      "market_regime": "BULL",
+      "name": "relative_weakness",
+      "playbook": "BEAR",
+      "reason": "Relative strength vs benchmark at a new 63-day low (RS ROC -7.1%)",
+      "stock_regime": "NEUTRAL",
+      "strength": 0.3,
+      "symbol": "CCC.TO",
+      "values": {
+        "rs": 1.950456,
+        "rs_prior_low": 1.988662,
+        "rs_roc": -7.120626
+      }
+    }
+  ],
+  "top_bearish": [
+    "BBB.TO",
+    "CCC.TO"
+  ],
+  "top_bullish": [
+    "AAA.TO"
+  ]
+}

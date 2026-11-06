@@ -1,0 +1,128 @@
+# tsx-div-ta configuration. Every key is optional; omitted keys use the defaults shown here.
+# Unknown keys are rejected so typos can't silently change behaviour.
+# Relative paths are resolved against the directory containing this file.
+
+[universe]
+# Yahoo/yfinance symbols: TSX listings use the ".TO" suffix; share classes / units use a hyphen.
+symbols = [
+  # Banks
+  "RY.TO", "TD.TO", "BNS.TO", "BMO.TO", "CM.TO", "NA.TO",
+  # Insurance / financials
+  "MFC.TO", "SLF.TO", "GWO.TO", "POW.TO",
+  # Pipelines / midstream
+  "ENB.TO", "TRP.TO", "PPL.TO",
+  # Utilities
+  "FTS.TO", "EMA.TO", "H.TO", "CU.TO",
+  # Telecom
+  "BCE.TO", "T.TO", "RCI-B.TO",
+  # Energy producers
+  "CNQ.TO", "SU.TO",
+  # REITs
+  "REI-UN.TO", "CAR-UN.TO",
+]
+benchmark = "XIC.TO"             # drives the market regime and relative strength
+
+[data]
+history_years = 5
+min_bars = 260                   # below this a symbol is INSUFFICIENT_HISTORY (no signals)
+batch_size = 10                  # symbols per Yahoo request
+batch_delay_s = 1.0              # polite pause between batches
+max_retries = 3
+backoff_base_s = 2.0             # exponential backoff base (seconds), plus jitter
+overlap_days = 5                 # incremental re-fetch overlap (business days)
+market_close_buffer = "16:30"    # America/Toronto; today's bar is ignored before this time
+cache_dir = "cache"
+reports_dir = "reports"
+logs_dir = "logs"
+state_file = "state/last_run.json"
+
+[indicators]
+sma_fast = 50
+sma_slow = 200
+ema = 21
+sma_slope_days = 20
+rsi = 14
+roc = 63
+atr = 14
+bb_length = 20
+bb_std = 2.0
+adx = 14
+macd_fast = 12
+macd_slow = 26
+macd_signal = 9
+supertrend_length = 10
+supertrend_mult = 3.0
+cmf = 20
+volume_sma = 20
+donchian = 55
+high_low_window = 252
+rs_window = 63
+
+[regime]
+confirm_bars = 3                 # hysteresis: closes required to switch regime
+breadth_bull = 0.60              # % of universe above SMA200 that supports BULL
+breadth_bear = 0.40              # ... and BEAR
+
+[signals]
+lookback_bars = 5                # event signals must have fired within this many bars
+rsi_pullback = 40.0
+rsi_bear_ceiling_low = 55.0
+rsi_bear_ceiling_high = 60.0
+rsi_oversold = 25.0
+adx_trend = 25.0
+adx_supertrend = 20.0
+breakout_rvol = 1.5
+breakout_rvol_bear = 2.0         # stricter confirmation for breakouts in a BEAR market
+atr_proximity = 1.0              # pullback must be within this many ATRs of EMA21 / SMA50
+counter_regime_scale = 0.6       # strength multiplier for signals against the market regime
+gate_counter_regime = false      # true = drop bull-playbook signals in BEAR markets (and vice versa)
+yield_percentile = 0.80
+yield_window_years = 5
+div_cut_pct = 0.10
+div_cut_lookback_days = 365
+special_div_mult = 2.0
+vol_expansion_mult = 1.5
+atr_stop_mult = 2.0
+
+[scoring]
+top_n = 5
+# Each component is built from several sub-factors in [-1, 1] (see README "Scoring").
+# Weights are per market regime and need not sum to 1 (they are normalised).
+
+[scoring.weights.BULL]
+trend = 0.25
+momentum = 0.20
+relative_strength = 0.15
+volume = 0.10
+dividend = 0.10
+risk = 0.10
+signals = 0.10
+
+[scoring.weights.BEAR]
+trend = 0.30
+momentum = 0.10
+relative_strength = 0.15
+volume = 0.05
+dividend = 0.10
+risk = 0.20
+signals = 0.10
+
+[scoring.weights.NEUTRAL]
+trend = 0.25
+momentum = 0.15
+relative_strength = 0.15
+volume = 0.10
+dividend = 0.15
+risk = 0.10
+signals = 0.10
+
+[review]
+# Optional AI review of the final report by Claude. Off unless enabled here or via `scan --review`.
+# Cost control: compact JSON digest in, small capped output, cheapest model, few tool turns.
+enabled = false
+model = "claude-haiku-5-5"
+max_tokens = 2000                # cap per response (adaptive thinking counts toward it)
+max_turns = 4                    # cap on agent tool-use round trips
+max_symbols = 12                 # report rows included in the digest
+api_key_env = "ANTHROPIC_API_KEY"
+timeout_s = 60.0
