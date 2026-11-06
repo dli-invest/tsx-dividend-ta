@@ -129,10 +129,14 @@ def _fit_total(embed: dict[str, Any]) -> None:
         longest["value"] = _trunc(longest["value"], max(20, len(longest["value"]) - excess))
 
 
-def build_payload(result: ScanResult) -> dict[str, Any]:
+def build_payload(result: ScanResult, image_name: str | None = None) -> dict[str, Any]:
+    embed = build_embed(result)
+    if image_name:
+        # An attached file referenced as attachment://name is shown inside the embed.
+        embed["image"] = {"url": f"attachment://{image_name}"}
     return {
         "username": "TSX dividend TA",
-        "embeds": [build_embed(result)],
+        "embeds": [embed],
         "allowed_mentions": {"parse": []},  # never ping anyone
     }
 
@@ -205,9 +209,15 @@ class DiscordNotifier:
         """Validate the webhook with a GET (posts nothing). Returns the HTTP status."""
         return self._request("GET", None, None)
 
-    def send(self, result: ScanResult, attachments: list[Path] | None = None) -> int:
+    def send(
+        self, result: ScanResult, attachments: list[Path] | None = None, image: Path | None = None
+    ) -> int:
         files = [p for p in (attachments or []) if p.is_file()]
-        body, ctype = _multipart(build_payload(result), files)
+        image_name = None
+        if image is not None and image.is_file():
+            files.append(image)
+            image_name = image.name
+        body, ctype = _multipart(build_payload(result, image_name), files)
         status = self._request("POST", body, ctype)
         log.info("Discord report posted (HTTP %d, %d attachment(s))", status, len(files))
         return status

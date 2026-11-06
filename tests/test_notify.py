@@ -232,11 +232,13 @@ class RecordingNotifier:
         self.fail = fail
         self.sent: list[tuple[ScanResult, list[Path]]] = []
         self.checked = 0
+        self.image: Path | None = None
 
-    def send(self, result: ScanResult, files: list[Path]) -> int:
+    def send(self, result: ScanResult, files: list[Path], image: Path | None = None) -> int:
         if self.fail:
             raise NotifyError("Discord webhook returned HTTP 401")
         self.sent.append((result, files))
+        self.image = image
         return 200
 
     def check(self) -> int:

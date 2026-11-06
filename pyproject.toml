@@ -25,8 +25,10 @@ dependencies = [
 
 [project.optional-dependencies]
 ai = ["anthropic==2.6.0"]  # optional AI review of reports (scan --review)
+plot = ["matplotlib==3.11.2"]  # optional chart in the Discord report
 dev = [
     "anthropic==2.6.0",
+    "matplotlib==3.11.2",
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
     "hypothesis==6.168.5",

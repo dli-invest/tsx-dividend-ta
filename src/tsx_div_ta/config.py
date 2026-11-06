@@ -333,6 +333,7 @@ class ReviewConfig:
 class NotifyConfig:
     discord_webhook_env: str = "DISCORD_WEBHOOK_URL"
     attach_files: bool = True
+    chart: bool = True  # needs the optional [plot] extra (matplotlib); skipped if missing
 
     def __post_init__(self) -> None:
         _check_types(self)

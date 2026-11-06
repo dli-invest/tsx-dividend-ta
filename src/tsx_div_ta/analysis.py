@@ -28,12 +28,20 @@ def build_analysis(
     return out
 
 
+def benchmark_frame(raw_bench: pd.DataFrame | None, cfg: AppConfig) -> pd.DataFrame | None:
+    """Benchmark indicators plus a ``regime`` label column (None if no benchmark data)."""
+    if raw_bench is None or raw_bench.empty:
+        return None
+    ind = compute_indicators(analysis_frame(raw_bench), cfg.indicators, None)
+    ind["regime"] = regime_labels(ind, cfg.regime.confirm_bars)
+    return ind
+
+
 def benchmark_regime(
     raw_bench: pd.DataFrame | None, cfg: AppConfig
 ) -> tuple[pd.Series | None, pd.Series | None]:
     """Return (adjusted benchmark close, confirmed market-regime labels)."""
-    if raw_bench is None or raw_bench.empty:
+    frame = benchmark_frame(raw_bench, cfg)
+    if frame is None:
         return None, None
-    base = analysis_frame(raw_bench)
-    ind = compute_indicators(base, cfg.indicators, None)
-    return base["close"], regime_labels(ind, cfg.regime.confirm_bars)
+    return frame["close"], frame["regime"].astype(object)

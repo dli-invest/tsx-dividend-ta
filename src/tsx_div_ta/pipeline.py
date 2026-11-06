@@ -13,7 +13,7 @@ from typing import Any
 import pandas as pd
 
 from tsx_div_ta import __version__
-from tsx_div_ta.analysis import benchmark_regime, build_analysis
+from tsx_div_ta.analysis import benchmark_frame, build_analysis
 from tsx_div_ta.clock import Clock
 from tsx_div_ta.config import AppConfig
 from tsx_div_ta.data.store import DataStore, LoadResult
@@ -28,6 +28,7 @@ STATUS_OK = "OK"
 STATUS_SHORT = "INSUFFICIENT_HISTORY"
 STATUS_FAILED = "FAILED"
 STATUS_ERROR = "ERROR"
+BENCHMARK_CHART_BARS = 252
 
 
 @dataclass
@@ -81,6 +82,8 @@ class ScanResult:
     top_bearish: list[str]
     meta: dict[str, Any] = field(default_factory=dict)
     review: dict[str, Any] | None = None
+    # Last year of benchmark close/SMAs/regime for charts; not part of the JSON report.
+    benchmark: pd.DataFrame | None = None
 
     @property
     def exit_code(self) -> int:
@@ -184,7 +187,9 @@ def run_scan(
     failures = dict(load.failures)
     seen = seen or set()
 
-    bench_close, labels = benchmark_regime(frames.get(bench_sym), cfg)
+    bench = benchmark_frame(frames.get(bench_sym), cfg)
+    bench_close = None if bench is None else bench["close"]
+    labels = None if bench is None else bench["regime"].astype(object)
     if labels is None:
         log.warning(
             "benchmark %s unavailable: market regime UNKNOWN, relative strength disabled", bench_sym
@@ -239,4 +244,7 @@ def run_scan(
             "stale": sorted(load.stale),
             "requested_as_of": as_of.isoformat() if as_of else None,
         },
+        benchmark=None
+        if bench is None
+        else bench[["close", "sma_fast", "sma_slow", "regime"]].tail(BENCHMARK_CHART_BARS).copy(),
     )

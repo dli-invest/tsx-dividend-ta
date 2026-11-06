@@ -60,10 +60,11 @@ git clone https://github.com/dli-invest/tsx-dividend-ta.git && cd tsx-dividend-t
 ```
 
 ```bash
-.venv/bin/pip install -e ".[ai]"
+.venv/bin/pip install -e ".[plot]"
 ```
 
-Use `".[dev,ai]"` to also install the test and lint tools. All versions are pinned exactly in
+`[plot]` (matplotlib) adds the chart to the Discord report; leave it out for the leanest install.
+Add `ai` for the optional Claude review, or use `".[dev,ai,plot]"` for the test and lint tools. All versions are pinned exactly in
 `pyproject.toml`.
 
 ## Usage
@@ -241,7 +242,7 @@ completed-bar cutoff. The job:
 
 1. checks that the webhook secret is present and valid (`check-webhook`, which posts nothing);
 2. restores the market-data cache and last-run state from the previous run (`actions/cache`);
-3. runs `scan --notify`, adding `--review` when an `ANTHROPIC_API_KEY` secret is available;
+3. runs `scan --notify` (no AI review: it needs an Anthropic API key, which the workflow doesn't use);
 4. uploads `reports/` and `logs/` as a 30-day artifact.
 
 **The Discord message** is one embed with:
@@ -250,9 +251,13 @@ completed-bar cutoff. The job:
 - the day's new signals
 - dividend alerts (cuts, yield traps)
 - data problems
-- the AI review, if enabled
+- the AI review, if you enable it locally
 
-`report.txt` and `signals.csv` are attached, and the message never @-mentions anyone.
+A **chart** is shown inside the embed: every stock's score as a sorted bar (blue bullish ≥ +20,
+gray neutral, red bearish ≤ −20) above a one-year chart of XIC.TO with its 50- and 200-day
+moving averages. `report.txt` and `signals.csv` are attached, and the message never @-mentions
+anyone. The chart needs the `[plot]` extra and adds about 1.5 s per run; set `chart = false` under
+`[notify]` to turn it off. If the chart can't be drawn, the report is still sent without it.
 
 **Secrets.** The webhook comes from the organization secret **`DISCORD_DAILY_REVIEW_WEBHOOK`**,
 mapped to `DISCORD_WEBHOOK_URL`. If the job fails with "secret is not available", an org admin
@@ -303,7 +308,7 @@ fixture blocks all network access. Other commands:
 | `.venv/bin/mypy` | type checks |
 | `UPDATE_GOLDEN=1 .venv/bin/python -m pytest tests/test_cli.py -k golden` | refresh the golden report after an intentional output change |
 
-The 331 tests cover:
+The 349 tests cover:
 - config validation
 - data cleaning, caching and incremental refresh
 - indicators vs reference formulas
@@ -312,7 +317,7 @@ The 331 tests cover:
 - golden JSON output
 - the CLI and its exit codes
 - the AI review loop (with a fake client)
-- the Discord notifier (embed limits, retries, secret handling)
+- the Discord notifier (embed limits, retries, secret handling) and the chart
 - randomized property-based tests
 - a 30-symbol × 5-year resource-budget test
 

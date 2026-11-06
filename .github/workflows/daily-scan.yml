@@ -26,8 +26,6 @@ jobs:
     env:
       TZ: America/Toronto
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_DAILY_REVIEW_WEBHOOK }}
-      # Optional: if an ANTHROPIC_API_KEY secret is available the report gets an AI review.
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       POST_TO_DISCORD: ${{ github.event_name == 'schedule' || inputs.post }}
     steps:
       - uses: actions/checkout@v7
@@ -41,7 +39,7 @@ jobs:
           cache-dependency-path: pyproject.toml
 
       - name: Install
-        run: pip install -e ".[ai]"
+        run: pip install -e ".[plot]"
 
       - name: Check Discord webhook (posts nothing)
         run: |
@@ -64,7 +62,6 @@ jobs:
       - name: Scan
         run: |
           args=(scan)
-          if [ -n "$ANTHROPIC_API_KEY" ]; then args+=(--review); fi
           if [ "$POST_TO_DISCORD" = "true" ]; then args+=(--notify); fi
           set +e
           python -m tsx_div_ta "${args[@]}"

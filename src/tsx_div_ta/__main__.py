@@ -9,6 +9,7 @@ import argparse
 import logging
 import os
 import sys
+import tempfile
 from collections.abc import Sequence
 from datetime import date
 from logging.handlers import RotatingFileHandler
@@ -260,11 +261,31 @@ def _notify(cfg: AppConfig, result: Any, paths: dict[str, Path], notifier: Any) 
 
     files = [paths[k] for k in ("txt", "csv") if k in paths] if cfg.notify.attach_files else []
     try:
-        _make_notifier(cfg, notifier).send(result, files)
+        sender = _make_notifier(cfg, notifier)
     except NotifyError as exc:
         log.error("Discord notification failed: %s", exc)
         return False
+    with tempfile.TemporaryDirectory(prefix="tsx-div-ta-") as tmp:
+        image = _render_chart(cfg, result, paths, Path(tmp)) if cfg.notify.chart else None
+        try:
+            sender.send(result, files, image=image)
+        except NotifyError as exc:
+            log.error("Discord notification failed: %s", exc)
+            return False
     return True
+
+
+def _render_chart(cfg: AppConfig, result: Any, paths: dict[str, Path], tmp: Path) -> Path | None:
+    """Chart next to the saved reports (or in a temp dir). A chart problem never blocks the
+    text report from being delivered."""
+    from tsx_div_ta.chart import render_chart
+
+    target = (paths["json"].parent if "json" in paths else tmp) / "chart.png"
+    try:
+        return render_chart(result, target)
+    except Exception as exc:  # plotting must never stop the notification
+        log.warning("chart skipped: %s: %s", type(exc).__name__, exc)
+        return None
 
 
 if __name__ == "__main__":  # pragma: no cover

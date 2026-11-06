@@ -132,3 +132,4 @@ timeout_s = 60.0
 # environment variable (in GitHub Actions it comes from the DISCORD_DAILY_REVIEW_WEBHOOK secret).
 discord_webhook_env = "DISCORD_WEBHOOK_URL"
 attach_files = true              # attach report.txt and signals.csv
+chart = true                     # scores + benchmark chart in the embed (needs the [plot] extra)
